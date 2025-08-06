@@ -15,7 +15,19 @@ export async function POST(req: Request) {
 
     // o3 series models use max_completion_tokens instead of max_tokens
     const isO3Model = selectedModel.startsWith('o3');
-    const requestBody: any = {
+    
+    interface OpenAIRequestBody {
+      model: string;
+      messages: Array<{
+        role: 'user' | 'assistant' | 'system';
+        content: string;
+      }>;
+      max_tokens?: number;
+      max_completion_tokens?: number;
+      temperature?: number;
+    }
+    
+    const requestBody: OpenAIRequestBody = {
       model: selectedModel,
       messages: [
         {

@@ -13,23 +13,32 @@ export async function POST(req: Request) {
 
     const selectedModel = model || 'gpt-4o';
 
+    // o3 series models use max_completion_tokens instead of max_tokens
+    const isO3Model = selectedModel.startsWith('o3');
+    const requestBody: any = {
+      model: selectedModel,
+      messages: [
+        {
+          role: 'user',
+          content: userMessage
+        }
+      ],
+    };
+
+    if (isO3Model) {
+      requestBody.max_completion_tokens = 4000;
+    } else {
+      requestBody.max_tokens = 4000;
+      requestBody.temperature = 0.7;
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: selectedModel,
-        messages: [
-          {
-            role: 'user',
-            content: userMessage
-          }
-        ],
-        max_tokens: 4000,
-        temperature: 0.7,
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const data = await response.json();

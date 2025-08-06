@@ -6,13 +6,18 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Message is required' }, { status: 400 });
     }
 
+    const apiKey = process.env.SEA_API_KEY;
+    if (!apiKey) {
+      return Response.json({ error: 'SEA_API_KEY not configured' }, { status: 500 });
+    }
+
     // Default to the 70B model if no model is specified
     const selectedModel = model || 'aisingapore/Llama-SEA-LION-v3.5-70B-R';
 
     const response = await fetch('https://api.sea-lion.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer sk-RlEIFVn_lnhDM0nmPTXXkg',
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'accept': 'text/plain'
       },
